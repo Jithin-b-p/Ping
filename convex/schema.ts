@@ -13,6 +13,6 @@ export default defineSchema({
     sender: v.id("users"),
     receiver: v.id("users"),
   })
-    .index("by_sender", ["sender"])
+    .index("by_receiver", ["receiver"])
     .index("by_receiver_sender", ["receiver", "sender"]),
 });
