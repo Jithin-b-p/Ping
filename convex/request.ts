@@ -95,3 +95,48 @@ export const deny = mutation({
     await ctx.db.delete(request._id);
   },
 });
+
+export const accept = mutation({
+  args: {
+    id: v.id("requests"),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+
+    if (!identity) throw new ConvexError("unauthorized user");
+
+    const currentUser = await getUserByClerkId({
+      ctx,
+      clerkId: identity.subject,
+    });
+
+    if (!currentUser) throw new ConvexError("user not found");
+
+    const request = await ctx.db.get(args.id);
+
+    if (!request || request.receiver === currentUser._id)
+      throw new ConvexError("Not a valid request");
+
+    const conversationId = await ctx.db.insert("conversations", {
+      isGroup: false,
+    });
+
+    await ctx.db.insert("friends", {
+      user1: currentUser._id,
+      user2: request.sender,
+      conversationId,
+    });
+
+    await ctx.db.insert("conversationMembers", {
+      conversationId,
+      memberId: currentUser._id,
+    });
+
+    await ctx.db.insert("conversationMembers", {
+      memberId: request.sender,
+      conversationId,
+    });
+
+    await ctx.db.delete(request._id);
+  },
+});
