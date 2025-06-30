@@ -53,7 +53,7 @@ export const create = mutation({
 
     const friends2 = await ctx.db
       .query("friends")
-      .withIndex("by_user2", (q) => q.eq("user2", receiver._id))
+      .withIndex("by_user2", (q) => q.eq("user2", currentUser._id))
       .collect();
 
     if (
@@ -114,7 +114,7 @@ export const accept = mutation({
 
     const request = await ctx.db.get(args.id);
 
-    if (!request || request.receiver === currentUser._id)
+    if (!request || request.receiver !== currentUser._id)
       throw new ConvexError("Not a valid request");
 
     const conversationId = await ctx.db.insert("conversations", {
