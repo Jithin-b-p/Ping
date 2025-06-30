@@ -46,6 +46,22 @@ export const create = mutation({
 
     if (reqAlreadyReceived) throw new ConvexError("Request already received");
 
+    const friends1 = await ctx.db
+      .query("friends")
+      .withIndex("by_user1", (q) => q.eq("user1", currentUser._id))
+      .collect();
+
+    const friends2 = await ctx.db
+      .query("friends")
+      .withIndex("by_user2", (q) => q.eq("user2", receiver._id))
+      .collect();
+
+    if (
+      friends1.some((friend) => friend.user2 === receiver._id) ||
+      friends2.some((friend) => friend.user1 === receiver._id)
+    ) {
+      throw new ConvexError("Already friends");
+    }
     const request = await ctx.db.insert("requests", {
       sender: currentUser._id,
       receiver: receiver._id,
