@@ -1,5 +1,6 @@
 "use client";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ThemeToggle } from "@/components/ui/theme/theme-toggle";
@@ -31,6 +32,11 @@ function DesktopNav() {
                     >
                       {path.icon}
                     </Button>
+                    {path.count ? (
+                      <Badge className="absolute px-2 left-6 bottom-7">
+                        {path.count}
+                      </Badge>
+                    ) : null}
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>{path.name}</p>
